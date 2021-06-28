@@ -14,12 +14,14 @@ import it.polito.tdp.crimes.model.Event;
 
 public class EventsDao {
 	
-	public List<Event> listAllEvents(){
-		String sql = "SELECT * FROM events" ;
+	public List<Event> listAllEvents(int anno){
+		String sql = "SELECT * FROM events "
+				+ "WHERE YEAR(reported_date) > ?" ;
 		try {
 			Connection conn = DBConnect.getConnection() ;
 
 			PreparedStatement st = conn.prepareStatement(sql) ;
+			st.setInt(1, anno);
 			
 			List<Event> list = new ArrayList<>() ;
 			
@@ -56,5 +58,37 @@ public class EventsDao {
 			return null ;
 		}
 	}
+	
+	public List<Integer> listDistrictCodes(){
+		
+		String sql = "SELECT DISTINCT district_id "
+				+ "FROM events" ;
+		try {
+			Connection conn = DBConnect.getConnection() ;
+
+			PreparedStatement st = conn.prepareStatement(sql) ;
+			
+			List<Integer> list = new ArrayList<>() ;
+			
+			ResultSet res = st.executeQuery() ;
+			
+			while(res.next()) {
+				try {
+					list.add(res.getInt("district_id"));
+				} catch (Throwable t) {
+					t.printStackTrace();
+				}
+			}
+			
+			conn.close();
+			return list ;
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null ;
+		}
+	}
+	
+	
 
 }
